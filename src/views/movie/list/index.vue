@@ -216,6 +216,7 @@ export default {
   },
   created() {
     this.fetchData();
+    console.log(this.$store.state.user);
   },
 };
 </script>
