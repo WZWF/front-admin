@@ -1,11 +1,11 @@
 <template>
   <div style="padding-top: 20px">
     <h2 style="text-align: center">添加电影视频资源</h2>
-    <el-form ref="form" :model="form" label-width="120px">
+    <el-form ref="form" :model="form" label-width="120px" :rules="formRules">
       <el-form-item hidden prop="id">
         <el-input v-model="form.id" />
       </el-form-item>
-      <el-form-item label="电影">
+      <el-form-item label="电影" required>
         <el-select
           v-model="form.mid"
           placeholder="请搜索电影"
@@ -24,15 +24,22 @@
         </el-select>
       </el-form-item>
       <el-form-item label="资源类别">
-        <el-radio-group v-model="form.type">
+        <el-radio-group v-model="form.type" @input="changeType">
           <el-radio :label="0">本地播放</el-radio>
           <el-radio :label="1">外部链接</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="上传方式">
+        <el-radio-group v-model="url">
+          <el-radio :label="0" :disabled="isDisabled">本地上传</el-radio>
+          <el-radio :label="1">输入链接</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="链接标题">
         <el-input v-model="form.title" type="text" />
       </el-form-item>
-      <el-card v-show="form.type == 0"
+      <el-card
+        v-show="url == 0"
         style="width: 80%; margin: 20px auto; text-align: center"
         header="上传本地视频"
       >
@@ -41,17 +48,18 @@
           drag
           action="/"
           multiple
+          accept=".mp4"
           :http-request="handleHttpRequest"
           :on-remove="handleRemoveFile"
-          >
+        >
           <el-icon class="el-icon-upload"><upload-filled /></el-icon>
           <div class="el-upload__text">
             请拖拽文件到此处或 <em>点击此处上传</em>
           </div>
         </el-upload>
       </el-card>
-      <el-form-item v-show="form.type == 1" label="链接路径">
-        <el-input v-model="form.URL" type="text" />
+      <el-form-item v-show="url == 1" label="链接路径">
+        <el-input v-model="form.url" type="text" />
       </el-form-item>
     </el-form>
     <div style="text-align: center">
@@ -62,32 +70,50 @@
 </template>
 <script>
 import { getID } from "@/api/common";
-import { getAllMovie } from "@/api/movie";
+import { getAllMovie, addMovievideoInfo } from "@/api/movie";
 import { taskInfo, initTask, preSignUrl, merge } from "@/api/upload";
 import { Notification } from "element-ui";
 import Queue from "promise-queue-plus";
 import axios from "axios";
-import md5 from '@/lib/md5'
+import md5 from "@/lib/md5";
 
 export default {
   data() {
-    
+    const validateTitle = (rule, value, callback) => {
+      if (value.length == 0) {
+        callback(new Error("Please enter the correct user name"));
+      } else {
+        callback();
+      }
+    };
     return {
+      isDisabled: false,
       form: {
         id: "",
         mid: "",
         type: 0,
         title: "",
+        url: "",
       },
+      formRules: {
+        title: [{ required: true, trigger: "blur", validator: validateTitle }],
+      },
+      url: 0,
       dataItems: [],
       allMovie: [],
       // 文件上传分块任务的队列（用于移除文件时，停止该文件的上传队列） key：fileUid value： queue object
-    fileUploadChunkQueue : [],
+      fileUploadChunkQueue: [],
     };
   },
   methods: {
     cancel() {
       this.$router.push({ name: "电影视频" });
+    },
+    changeType() {
+      if (this.form.type == 1) {
+        this.isDisabled = true;
+        this.url = 1;
+      } else this.isDisabled = false;
     },
     remoteMethod(query) {
       if (query !== "") {
@@ -165,7 +191,7 @@ export default {
           });
         }
         return Promise.reject(`分片${partNumber}, 获取上传地址失败`);
-      }
+      };
       /**
        * 更新上传进度
        * @param increment 为已上传的进度增加的字节量
@@ -223,9 +249,9 @@ export default {
         queue.start();
       });
 
-      prom.abort = ()=>{}
+      prom.abort = () => {};
 
-      return prom
+      return prom;
     },
     /**
      * el-upload 自定义上传方法入口
@@ -237,9 +263,13 @@ export default {
         const { finished, path, taskRecordVO } = task;
         const { fileIdentifier: identifier } = taskRecordVO;
         if (finished) {
-          return path;
+          this.form.url = path;
         } else {
-          const errorList = await this.handleUpload(file, taskRecordVO, options);
+          const errorList = await this.handleUpload(
+            file,
+            taskRecordVO,
+            options
+          );
           if (errorList.length > 0) {
             Notification.error({
               title: "文件上传错误",
@@ -249,7 +279,7 @@ export default {
           }
           const { code, obj, message } = await merge(identifier);
           if (code === 200) {
-            return path;
+            this.form.url = path;
           } else {
             Notification.error({
               title: "文件上传错误",
@@ -269,8 +299,8 @@ export default {
      * 如果文件存在上传队列任务对象，则停止该队列的任务
      */
     handleRemoveFile(uploadFile, uploadFiles) {
-      console.log(1111)
-      console.log(uploadFile)
+      console.log(1111);
+      console.log(uploadFile);
       const queueObject = this.fileUploadChunkQueue[uploadFile.uid];
       if (queueObject) {
         queueObject.stop();
@@ -278,11 +308,30 @@ export default {
       }
     },
     submitForm() {
-      // 提交表单数据
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          addMovievideoInfo(this.form).then((res) => {
+            if (res.code === 200) {
+              this.$message.success("添加成功");
+              this.$router.push({ name: "电影视频" });
+            } else {
+              this.$message.error(res.message);
+            }
+          })
+        } else {
+          return false;
+        }
+      })
     },
   },
   created() {
-    this.form.id = getID();
+    getID().then((res) => {
+      if (res.code === 200) {
+        this.form.id = res.obj;
+      } else {
+        $this.$message.error("发送未知错误！请刷新重试！");
+      }
+    });
     // 获取所有电影
     new Promise(() =>
       getAllMovie().then((resp) => {

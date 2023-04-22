@@ -15,6 +15,9 @@
             </el-button>
           </el-input>
         </el-col>
+        <el-col :span="4">
+          <el-button type="primary" @click="addMovie"> 添加电影 </el-button>
+        </el-col>
       </el-row>
 
       <!-- 表格视图区域 -->
@@ -24,8 +27,14 @@
         :data="tableData"
         style="width: 100%"
       >
-        <el-table-column header-align="center" prop="name" label="电影名" width="150px" fixed>
-          <template scope="scope">
+        <el-table-column
+          header-align="center"
+          prop="name"
+          label="电影名"
+          width="150px"
+          fixed
+        >
+          <template slot-scope="scope">
             <el-tooltip :content="scope.row.name" placement="top">
               <div
                 style="
@@ -48,7 +57,7 @@
           label="描述"
           width="300"
         >
-          <template scope="scope">
+          <template slot-scope="scope">
             <el-tooltip :content="scope.row.descri" placement="top">
               <div
                 style="
@@ -92,7 +101,7 @@
         <el-table-column prop="director" header-align="center" label="导演">
         </el-table-column>
         <el-table-column prop="actors" header-align="center" label="演员">
-          <template scope="scope">
+          <template slot-scope="scope">
             <el-tooltip :content="scope.row.actors" placement="top">
               <div
                 style="

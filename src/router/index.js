@@ -96,6 +96,12 @@ export const constantRoutes = [
         component: () => import('@/views/movie/video/addFrom'),
         meta: { title: '电影视频添加' },
         hidden: true
+      },
+      {
+        path: 'movie_comment',
+        name: '电影评论管理',
+        component: () => import('@/views/movie/comment/index'),
+        meta: { title: '电影评论管理', icon: 'el-icon-chat-line-round' }
       }
     ]
   },
@@ -127,21 +133,15 @@ export const constantRoutes = [
       {
         path: 'index',
         name: '文章管理',
-        component: () => import('@/views/table/index'),
+        component: () => import('@/views/forum/essay/index'),
         meta: { title: '文章管理', icon: 'el-icon-notebook-1' }
       },
       {
         path: 'essay_comment',
         name: '文章评论管理',
-        component: () => import('@/views/table/index'),
+        component: () => import('@/views/forum/comment/index'),
         meta: { title: '文章评论管理', icon: 'el-icon-chat-square' }
       },
-      {
-        path: 'movie_comment',
-        name: '电影评论管理',
-        component: () => import('@/views/table/index'),
-        meta: { title: '电影评论管理', icon: 'el-icon-chat-line-round' }
-      }
     ]
   },
 
@@ -175,7 +175,7 @@ export const constantRoutes = [
       {
         path: 'log',
         name: '日志管理',
-        component: () => import('@/views/table/index'),
+        component: () => import('@/views/system/log/index'),
         meta: { title: '日志管理', icon: 'el-icon-document' }
       }
     ]
@@ -189,7 +189,7 @@ export const constantRoutes = [
     children: [{
       path: '/admin_manage',
       name: '信息',
-      component: () => import('@/views/table/index'),
+      component: () => import('@/views/admin/info/index'),
       meta: { title: '信息', icon: 'dashboard' },
     }],
     hidden: true

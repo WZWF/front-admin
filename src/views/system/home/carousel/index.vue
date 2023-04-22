@@ -165,7 +165,6 @@ export default {
       }
     },
     loadmore(){
-      console.log(111)
       this.moviePageData.index++;
       this.getItems(this.moviePageData)
     },
@@ -247,7 +246,6 @@ export default {
       new Promise(() =>
         getID().then((resp) => {
           const { obj } = resp;
-          console.log(obj);
           this.addForm.id = obj;
         })
       );

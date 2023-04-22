@@ -41,7 +41,7 @@
         <el-table-column header-align="center" prop="username" label="用户名" fixed> </el-table-column>
         <el-table-column header-align="center" prop="email" label="用户邮箱" width="200"> </el-table-column>
         <el-table-column header-align="center" label="用户头像" width="100">
-          <template scope="scope">
+          <template slot-scope="scope">
             <el-avatar :src="scope.row.head"></el-avatar>
           </template>
         </el-table-column>
@@ -57,15 +57,30 @@
         <el-table-column prop="status" header-align="center" label="账户状态" width="100" :formatter="USF">
         </el-table-column>
         <el-table-column fixed="right" header-align="center" label="操作" width="120">
-          <template slot-scope="scope">
-            <el-button
-              @click.native.prevent="deleteRow(scope.$index, userData)"
-              type="text"
-              size="small"
-            >
-              移除
-            </el-button>
-          </template>
+          <!-- <template slot-scope="scope">
+            <el-dropdown trigger="click">
+              <span class="el-icon-more-outline"></span>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="deleteRow(scope.row)"
+                  >修改板块</el-dropdown-item
+                >
+                <el-dropdown-item v-show="scope.row.status == 2"
+                  >发送激活邮件</el-dropdown-item
+                >
+                <el-dropdown-item
+                  @click="deleteRow(scope.row)"
+          
+                  >置顶</el-dropdown-item
+                >
+                <el-dropdown-item @click="deleteRow(scope.row)"
+                  >删除</el-dropdown-item
+                >
+                <el-dropdown-item @click="deleteRow(scope.row)"
+                  >审核</el-dropdown-item
+                >
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template> -->
         </el-table-column>
       </el-table>
       <!-- 分页区域 -->

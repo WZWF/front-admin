@@ -28,7 +28,7 @@
         @expand-change="handleExpandChange"
       >
         <el-table-column type="expand">
-          <template scope="data">
+          <template slot-scope="data">
             <span class="demonstration">类别所包含的电影</span>
             <div id="elagDIV" style="margin-top: 10px">
               <el-tag
@@ -77,7 +77,7 @@
       </el-pagination>
       <!-- 添加的对话框 -->
       <el-dialog
-        title="添加轮播图"
+        title="添加电影类别"
         :visible.sync="addDialogVisible"
         width="50%"
         @close="addDialogClosed"
@@ -106,7 +106,7 @@
 
       <!-- 编辑的对话框 -->
       <el-dialog
-        title="编辑轮播图设置"
+        title="编辑电影类别设置"
         :visible.sync="editDialogVisible"
         width="50%"
         @close="editDialogClosed"
@@ -241,9 +241,9 @@ export default {
         } else {
           updateType(this.editForm).then((resp) => {
             if (resp.code !== 200) {
-              this.$message.error("编辑轮播图信息失败！");
+              this.$message.error("编辑电影类别信息失败！");
             } else {
-              this.$message.success("编辑轮播图信息成功！");
+              this.$message.success("编辑电影类别信息成功！");
               // 隐藏对话框
               this.editDialogVisible = false;
               this.fetchData();

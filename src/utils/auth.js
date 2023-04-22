@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-const TokenKey = 'movie_token'
+const TokenKey = 'movie_admin_token'
 
 export function getToken() {
   return Cookies.get(TokenKey)

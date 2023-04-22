@@ -36,3 +36,42 @@ export function updateCarousel(data) {
         data
     })
 }
+
+export function getRecommendList(data) {
+    return request({
+        url: '/admin/systemManager/sysRecommends',
+        method: 'get',
+        params: data
+    })
+}
+
+export function addReco(data) {
+    return request({
+        url: '/admin/systemManager/sysRecommend',
+        method: 'post',
+        data
+    })
+}
+
+export function delReco(id) {
+    return request({
+        url: '/admin/systemManager/sysRecommend/' + id,
+        method: 'delete',
+    })
+}
+
+export function updateReco(data) {
+    return request({
+        url: '/admin/systemManager/updateSysRecommend',
+        method: 'post',
+        data
+    })
+}
+
+export function getLogInfo(rid, queryInfo) {
+    return request({
+        url: '/admin/systemManager/logInfo/' + rid,
+        method: 'get',
+        params: queryInfo,
+    })
+}

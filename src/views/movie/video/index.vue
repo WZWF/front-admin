@@ -6,12 +6,12 @@
         <el-col :span="8">
           <el-input
             placeholder="根据电影名查询"
-            v-model="queryInfo.name"
+            v-model="queryInfo.condition"
             clearable
             @clear="fetchData"
-            @input="searchList"
+            @input="fetchData"
           >
-            <el-button slot="append" icon="el-icon-search" @click="searchList">
+            <el-button slot="append" icon="el-icon-search" @click="fetchData">
             </el-button>
           </el-input>
         </el-col>
@@ -21,130 +21,33 @@
           </el-button>
         </el-col>
       </el-row>
-
       <!-- 表格视图区域 -->
-      <el-table
-        :cell-style="rowStyle"
-        v-loading="listLoading"
-        :data="tableData"
-        style="width: 100%"
-      >
-        <el-table-column
-          header-align="center"
-          prop="name"
-          label="电影名"
-          width="150px"
-          fixed
-        >
-          <template scope="scope">
-            <el-tooltip :content="scope.row.name" placement="top">
-              <div
-                style="
-                  overflow: hidden;
-                  display: -webkit-box;
-                  text-overflow: ellipsis;
-                  -webkit-line-clamp: 1;
-                  -webkit-box-orient: vertical;
-                  white-space: normal;
-                "
-              >
-                {{ scope.row.name }}
-              </div>
-            </el-tooltip>
+      <el-table v-loading="listLoading" :data="tableData" style="width: 100%">
+        <el-table-column prop="name" label="电影名"> </el-table-column>
+        <el-table-column prop="title" label="标题"> </el-table-column>
+        <el-table-column label="播放类型">
+          <template slot-scope="scope">
+            <span v-if="scope.row.type == 0">本地播放</span>
+            <span v-if="scope.row.type == 1">外部链接</span>
           </template>
         </el-table-column>
-        <el-table-column
-          header-align="center"
-          prop="descri"
-          label="描述"
-          width="300"
-        >
-          <template scope="scope">
-            <el-tooltip :content="scope.row.descri" placement="top">
-              <div
-                style="
-                  overflow: hidden;
-                  display: -webkit-box;
-                  text-overflow: ellipsis;
-                  -webkit-line-clamp: 2;
-                  -webkit-box-orient: vertical;
-                  white-space: normal;
-                "
-              >
-                {{ scope.row.descri }}
-              </div>
-            </el-tooltip>
-          </template>
-        </el-table-column>
-        <el-table-column
-          header-align="center"
-          label="电影时长(分)"
-          prop="timelong"
-          width="100"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="shoot"
-          header-align="center"
-          label="电影拍摄日期"
-          width="120"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="issue"
-          header-align="center"
-          label="电影发行日期"
-          width="120"
-        ></el-table-column>
-        <el-table-column prop="language" header-align="center" label="电影语言">
-        </el-table-column>
-        <el-table-column prop="genres" header-align="center" label="电影类别">
-        </el-table-column>
-        <el-table-column prop="director" header-align="center" label="导演">
-        </el-table-column>
-        <el-table-column prop="actors" header-align="center" label="演员">
-          <template scope="scope">
-            <el-tooltip :content="scope.row.actors" placement="top">
-              <div
-                style="
-                  overflow: hidden;
-                  display: -webkit-box;
-                  text-overflow: ellipsis;
-                  -webkit-line-clamp: 2;
-                  -webkit-box-orient: vertical;
-                  white-space: normal;
-                "
-              >
-                {{ scope.row.actors }}
-              </div>
-            </el-tooltip>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="createTime"
-          header-align="center"
-          label="上传时间"
-          width="200"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="updateTime"
-          header-align="center"
-          label="最近一次更新时间"
-          width="200"
-        >
-        </el-table-column>
-        <el-table-column
-          fixed="right"
-          header-align="center"
-          label="操作"
-          width="120"
-        >
+        <el-table-column prop="url" label="播放链接"> </el-table-column>
+        <el-table-column prop="createTime" label="上传时间"> </el-table-column>
+        <el-table-column fixed="right" label="操作" width="240px">
           <template slot-scope="scope">
             <el-button
-              @click.native.prevent="deleteRow(scope.$index, userData)"
-              type="text"
-              size="small"
+              type="primary"
+              icon="el-icon-view"
+              @click.native.prevent="preview(scope.row)"
+              size="mini"
+            >
+              预览
+            </el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              @click.native.prevent="remove(scope.row.id)"
+              size="mini"
             >
               移除
             </el-button>
@@ -163,11 +66,16 @@
       >
       </el-pagination>
     </el-card>
+    <div class="video_con" v-show="videoIsShow" style="display: none">
+      <video :src="videoUrl" controls="controls" ref="videoPlayer">
+      </video>
+      <div class="mask" @click="hide"></div>
+    </div>
   </div>
 </template>
 
 <script>
-import { getList } from "@/api/movie";
+import { getVideoList, delVideo } from "@/api/movie";
 export default {
   methods: {
     toAddFrom() {
@@ -176,36 +84,40 @@ export default {
     rowStyle() {
       return "text-align:center";
     },
-    deleteRow(index, rows) {
-      rows.splice(index, 1);
-    },
-    async searchList() {
-      if (this.queryInfo.username == "") {
-        this.fetchData();
-        return;
-      }
-      this.listLoading = true;
-      getList(this.queryInfo).then((response) => {
-        if (response.code !== 200) {
-          return this.$message.error(response.message);
-        } else {
-          this.tableData = response.obj.objs;
-          this.listLoading = false;
-          this.totalCount = response.obj.count;
+    async remove(id) {
+      const confirmResult = await this.$confirm(
+        "此操作将永久删除该记录，是否继续？",
+        "dangerous!",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
         }
-      });
+      ).catch((err) => err);
+      if (confirmResult != "confirm") {
+        return this.$message.info("取消删除！");
+      } else {
+        delVideo(id).then((resp) => {
+          if (resp.code != 200) {
+            return this.$message.error("删除失败！");
+          } else {
+            this.$message.success("删除成功！");
+            this.fetchData();
+          }
+        });
+      }
     },
     async fetchData() {
       this.listLoading = true;
-      getList(this.queryInfo).then((response) => {
+      getVideoList(this.queryInfo).then((response) => {
         if (response.code !== 200) {
           return this.$message.error(response.message);
         } else {
-          this.tableData = response.obj.objs;
-          this.listLoading = false;
-          this.totalCount = response.obj.count;
+          this.tableData = response.obj.objs == null ? [] : response.obj.objs;
+          this.totalCount = response.obj.count == null ? 0 : response.obj.count;
         }
       });
+      this.listLoading = false;
     },
     handleSizeChange(newSize) {
       this.queryInfo.pageSize = newSize;
@@ -215,17 +127,34 @@ export default {
       this.queryInfo.curPage = newPage;
       this.fetchData();
     },
+    preview(row) {
+      if (row.type == 0) {
+        this.isShowMoreVideo = false;
+        this.videoIsShow = true;
+        this.videoUrl = row.url;
+      } else if (row.type == 1) {
+        this.isShowMoreVideo = false;
+        window.open(row.url, "_blank");
+      }
+    },
+    hide() {
+      this.$refs.videoPlayer.pause();
+      this.videoUrl = null;
+      this.videoIsShow = false;
+    },
   },
   data() {
     return {
-      tableData: null,
+      tableData: [],
       listLoading: true,
       queryInfo: {
         curPage: 1,
         pageSize: 5,
-        name: "",
+        condition: "",
       },
       totalCount: 0,
+      videoIsShow: false,
+      videoUrl: "",
     };
   },
   created() {
@@ -233,3 +162,25 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.video_con video {
+  position: fixed;
+  width: 800px;
+  height: 546px;
+  left: 50%;
+  top: 50%;
+  margin-top: -273px;
+  transform: translateX(-50%);
+  z-index: 990;
+}
+.video_con .mask {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: 980;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+</style>
