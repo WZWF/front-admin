@@ -27,6 +27,18 @@
         :data="tableData"
         style="width: 100%"
       >
+        <el-table-column type="expand" fixed>
+          <template slot-scope="data">
+            <span class="demonstration">电影海报</span>
+            <div style="margin-top: 10px">
+              <el-image
+                style="width: 100px; height: 100px"
+                :src="data.row.posterURL"
+                :fit="fill"
+              ></el-image>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column
           header-align="center"
           prop="name"

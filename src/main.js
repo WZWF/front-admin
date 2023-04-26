@@ -15,6 +15,17 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+import "echarts"
+import VueEcharts from "vue-echarts"
+
+import editorHtml from '@/components/editor/editorHtml'
+import imageViewer from '@/components/image/imageViewer'
+
+Vue.component("editorHtml", editorHtml)
+Vue.component("imageViewer", imageViewer)
+
+Vue.component("VueEcharts",VueEcharts)
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

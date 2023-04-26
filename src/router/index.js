@@ -142,6 +142,11 @@ export const constantRoutes = [
         component: () => import('@/views/forum/comment/index'),
         meta: { title: '文章评论管理', icon: 'el-icon-chat-square' }
       },
+      {
+        name: 'review',
+        path: 'review/:id',
+        component: () => import("@/views/forum/essay/review"),
+      },
     ]
   },
 

@@ -166,7 +166,6 @@ export default {
         rows.forEach(row => {
             this.selectList.push(row.id)
         });
-        console.log(this.selectList);
     },
     showLogbyTime() {
       this.queryInfo.startTime = this.getTimeStr(this.value2[0]);

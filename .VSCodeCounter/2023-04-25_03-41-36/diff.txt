@@ -1,0 +1,55 @@
+Date : 2023-04-25 03:41:36
+Directory : d:\czcfiles\code\vue-admin-template
+Total : 13 files,  1409 codes, 24 comments, 19 blanks, all 1452 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Vue        |          9 |      1,349 |         24 |          9 |      1,382 |
+| JavaScript |          3 |         59 |          0 |         10 |         69 |
+| JSON       |          1 |          1 |          0 |          0 |          1 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                  | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                     |         13 |      1,409 |         24 |         19 |      1,452 |
+| . (Files)                                                             |          1 |          1 |          0 |          0 |          1 |
+| src                                                                   |         12 |      1,408 |         24 |         19 |      1,451 |
+| src (Files)                                                           |          1 |        258 |          7 |          8 |        273 |
+| src\api                                                               |          3 |         59 |          0 |         10 |         69 |
+| src\views                                                             |          8 |      1,091 |         17 |          1 |      1,109 |
+| src\views\forum                                                       |          2 |        698 |          8 |          2 |        708 |
+| src\views\forum\comment                                               |          1 |        349 |          4 |          1 |        354 |
+| src\views\forum\essay                                                 |          1 |        349 |          4 |          1 |        354 |
+| src\views\movie                                                       |          4 |        365 |          2 |          0 |        367 |
+| src\views\movie\comment                                               |          1 |        261 |          3 |          0 |        264 |
+| src\views\movie\list                                                  |          1 |         12 |          0 |          0 |         12 |
+| src\views\movie\video                                                 |          2 |         92 |         -1 |          0 |         91 |
+| src\views\system                                                      |          1 |         52 |        -17 |          0 |         35 |
+| src\views\system\log                                                  |          1 |         52 |        -17 |          0 |         35 |
+| src\views\user                                                        |          1 |        -24 |         24 |         -1 |         -1 |
+| src\views\user\list                                                   |          1 |        -24 |         24 |         -1 |         -1 |
++-----------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                              | language   | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| d:\czcfiles\code\vue-admin-template\package.json                      | JSON       |          1 |          0 |          0 |          1 |
+| d:\czcfiles\code\vue-admin-template\src\Home.vue                      | Vue        |        258 |          7 |          8 |        273 |
+| d:\czcfiles\code\vue-admin-template\src\api\forum.js                  | JavaScript |         12 |          0 |          3 |         15 |
+| d:\czcfiles\code\vue-admin-template\src\api\movie.js                  | JavaScript |         40 |          0 |          6 |         46 |
+| d:\czcfiles\code\vue-admin-template\src\api\system.js                 | JavaScript |          7 |          0 |          1 |          8 |
+| d:\czcfiles\code\vue-admin-template\src\views\forum\comment\index.vue | Vue        |        349 |          4 |          1 |        354 |
+| d:\czcfiles\code\vue-admin-template\src\views\forum\essay\index.vue   | Vue        |        349 |          4 |          1 |        354 |
+| d:\czcfiles\code\vue-admin-template\src\views\movie\comment\index.vue | Vue        |        261 |          3 |          0 |        264 |
+| d:\czcfiles\code\vue-admin-template\src\views\movie\list\index.vue    | Vue        |         12 |          0 |          0 |         12 |
+| d:\czcfiles\code\vue-admin-template\src\views\movie\video\addFrom.vue | Vue        |         44 |         -1 |         -1 |         42 |
+| d:\czcfiles\code\vue-admin-template\src\views\movie\video\index.vue   | Vue        |         48 |          0 |          1 |         49 |
+| d:\czcfiles\code\vue-admin-template\src\views\system\log\index.vue    | Vue        |         52 |        -17 |          0 |         35 |
+| d:\czcfiles\code\vue-admin-template\src\views\user\list\index.vue     | Vue        |        -24 |         24 |         -1 |         -1 |
+| Total                                                                 |            |      1,409 |         24 |         19 |      1,452 |
++-----------------------------------------------------------------------+------------+------------+------------+------------+------------+

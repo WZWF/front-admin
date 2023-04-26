@@ -29,3 +29,24 @@ export function logout() {
     method: 'post'
   })
 }
+
+export function resendEmailById(id) {
+  return request({
+    url: '/admin/userManager/sendEmail/' + id,
+    method: 'get'
+  })
+}
+
+export function resetPassById(id) {
+  return request({
+    url: '/admin/userManager/resetUserPass/' + id,
+    method: 'get'
+  })
+}
+
+export function delUserById(id) {
+  return request({
+    url: '/admin/userManager/' + id,
+    method: 'delete'
+  })
+}

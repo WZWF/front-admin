@@ -8,7 +8,6 @@
             placeholder="根据用户名查询"
             v-model="queryInfo.username"
             clearable
-            @clear="fetchData"
             @input="fetchData"
           >
           </el-input>
@@ -34,26 +33,44 @@
             end-placeholder="结束日期"
             align="right"
             @change="showLogbyTime"
+            @clear="clearTime"
           >
           </el-date-picker>
         </el-col>
       </el-row>
-      <el-row style="margin-bottom: 15px; margin-top: 15px;">
-        <el-col :span="5">
+      <el-row style="margin-bottom: 15px; margin-top: 15px">
+        <el-col :span="6">
           <el-radio-group
             v-model="queryInfo.isAudited"
             @input="changeSelect"
             style="margin-top: 10px"
           >
-            <el-radio :label="0">已审核文章</el-radio>
-            <el-radio :label="1">未审核文章</el-radio>
+            <el-radio :label="2">全部</el-radio>
+            <el-radio :label="1">已审核文章</el-radio>
+            <el-radio :label="0">未审核文章</el-radio>
           </el-radio-group>
         </el-col>
         <el-col :span="2">
-          <el-button type="danger" size="mini" @click="deletedBatch" v-show="selectList.length" round> 批量删除 </el-button>
+          <el-button
+            type="danger"
+            size="mini"
+            @click="deletedBatch"
+            v-show="selectList.length"
+            round
+          >
+            批量删除
+          </el-button>
         </el-col>
         <el-col :span="2">
-          <el-button type="primary" size="mini" @click="deletedBatch" v-show="selectList.length" round> 批量审核 </el-button>
+          <el-button
+            type="primary"
+            size="mini"
+            @click="auditedByBatch"
+            v-show="selectList.length"
+            round
+          >
+            批量审核
+          </el-button>
         </el-col>
       </el-row>
       <!-- 表格视图区域 -->
@@ -94,7 +111,10 @@
         </el-table-column>
         <el-table-column header-align="cover" label="封面" width="100">
           <template slot-scope="scope">
-            <el-avatar :src="scope.row.userImg"></el-avatar>
+            <el-image v-if="scope.row.cover"
+              style="width: 50px; height: 50px"
+              :src="scope.row.cover"
+            ></el-image>
           </template>
         </el-table-column>
         <el-table-column prop="name" label="关联电影名">
@@ -131,24 +151,26 @@
           <template slot-scope="scope">
             <el-dropdown trigger="click">
               <span class="el-icon-more-outline"></span>
-              <el-dropdown-menu>
-                <el-dropdown-item @click="remove(scope.row.id)"
-                  >删除</el-dropdown-item
-                >
-                <el-dropdown-item @click="remove(scope.row.id)"
-                  >预览</el-dropdown-item
-                >
-                <el-dropdown-item
-                  v-if="scope.row.status == 2"
-                  @click="audited(scope.row.id, 0)"
-                  >通过审核</el-dropdown-item
-                >
-                <el-dropdown-item
-                  v-if="scope.row.status == 2"
-                  @click="audited(scope.row.id, 1)"
-                  >未通过审核</el-dropdown-item
-                >
-              </el-dropdown-menu>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click.native="remove(scope.row.id)"
+                    >删除</el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    ><router-link :to="'/comment_manage/review/' + scope.row.id">预览</router-link></el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    v-if="scope.row.status == 2"
+                    @click.native="audited(scope.row.id, 1)"
+                    >通过审核</el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    v-if="scope.row.status == 2"
+                    @click.native="audited(scope.row.id, 0)"
+                    >未通过审核</el-dropdown-item
+                  >
+                </el-dropdown-menu>
+              </template>
             </el-dropdown>
           </template>
         </el-table-column>
@@ -169,14 +191,69 @@
 </template>
 
 <script>
-import { getArticles } from "@/api/forum";
+import {
+  getArticles,
+  delEassyByBatch,
+  auditedEssay,
+  auditedEssayByBatch,
+  delEssay,
+} from "@/api/forum";
 export default {
   methods: {
     changeSelect() {
-      //this.fetchData();
+      this.queryInfo.curPage = 1;
+      this.queryInfo.pageSize = 5;
+      this.fetchData();
     },
-    audited(id) {},
-    remove(id, idx) {},
+    async audited(id, type) {
+      const confirmResult = await this.$confirm("确定审批文章？", "Info", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "info",
+      }).catch((err) => err);
+      if (confirmResult != "confirm") {
+        return this.$message.info("取消审批！");
+      } else {
+        auditedEssay(type, id).then((resp) => {
+          if (resp.code != 200) {
+            return this.$message.error("审批失败！");
+          } else {
+            this.$message.success("审批成功！");
+            this.fetchData();
+          }
+        });
+      }
+    },
+    async auditedByBatch() {
+      if (this.selectList.length == 0) return;
+      const confirmResult = await this.$confirm(
+        "是否批量审批的文章？",
+        "Info",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "info",
+        }
+      ).catch((err) => err);
+      if (confirmResult != "confirm") {
+        return this.$message.info("取消审批！");
+      } else {
+        let ids = [];
+        this.selectList.forEach((row) => {
+          if (row.status == 2) {
+            ids.push(row.id);
+          }
+        });
+        auditedEssayByBatch(ids).then((resp) => {
+          if (resp.code != 200) {
+            return this.$message.error("审批失败！");
+          } else {
+            this.$message.success("审批成功！");
+            this.fetchData();
+          }
+        });
+      }
+    },
     async deletedBatch() {
       if (this.selectList.length == 0) return;
       const confirmResult = await this.$confirm(
@@ -191,7 +268,11 @@ export default {
       if (confirmResult != "confirm") {
         return this.$message.info("取消删除！");
       } else {
-        delMovieCommentByBatch(this.selectList).then((resp) => {
+        let ids = [];
+        this.selectList.forEach((row) => {
+          ids.push(row.id);
+        });
+        delEassyByBatch(ids).then((resp) => {
           if (resp.code != 200) {
             return this.$message.error("删除失败！");
           } else {
@@ -217,7 +298,7 @@ export default {
       if (confirmResult != "confirm") {
         return this.$message.info("取消删除！");
       } else {
-        delMovieComment(id).then((resp) => {
+        delEssay(id).then((resp) => {
           if (resp.code != 200) {
             return this.$message.error("删除失败！");
           } else {
@@ -250,11 +331,25 @@ export default {
     handleSelectionChange(rows) {
       this.selectList = [];
       rows.forEach((row) => {
-        this.selectList.push(row.id);
+        this.selectList.push(row);
       });
-      console.log(this.selectList);
+    },
+    resetPageInfo() {
+      this.queryInfo.curPage = 1;
+      this.queryInfo.pageSize = 5;
+    },
+    clearTime() {
+      this.resetPageInfo();
+      this.queryInfo.startTime = null;
+      this.queryInfo.endTime = null;
+      this.fetchData();
     },
     showLogbyTime() {
+      if (this.value2 == null) {
+        this.clearTime();
+        return;
+      }
+      this.resetPageInfo();
       this.queryInfo.startTime = this.getTimeStr(this.value2[0]);
       this.queryInfo.endTime = this.getTimeStr(this.value2[1]);
       this.fetchData();
