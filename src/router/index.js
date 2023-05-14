@@ -98,6 +98,13 @@ export const constantRoutes = [
         hidden: true
       },
       {
+        path: 'list/addForm',
+        name: '添加电影',
+        component: () => import('@/views/movie/list/addFrom'),
+        meta: { title: '电影视频添加' },
+        hidden: true
+      },
+      {
         path: 'movie_comment',
         name: '电影评论管理',
         component: () => import('@/views/movie/comment/index'),

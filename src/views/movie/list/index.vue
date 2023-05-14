@@ -152,9 +152,10 @@
         >
           <template slot-scope="scope">
             <el-button
-              @click.native.prevent="deleteRow(scope.$index, userData)"
-              type="text"
-              size="small"
+              type="danger"
+              icon="el-icon-delete"
+              @click.native.prevent="remove(scope.row.id)"
+              size="mini"
             >
               移除
             </el-button>
@@ -177,14 +178,37 @@
 </template>
 
 <script>
-import { getList } from "@/api/movie";
+import { getList, delMovieById } from "@/api/movie";
 export default {
   methods: {
+    addMovie() {
+      this.$router.push({ name: "添加电影" });
+    },
     rowStyle() {
       return "text-align:center";
     },
-    deleteRow(index, rows) {
-      rows.splice(index, 1);
+    async remove(id) {
+      const confirmResult = await this.$confirm(
+        "此操作将永久删除该记录，是否继续？",
+        "dangerous!",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      ).catch((err) => err);
+      if (confirmResult != "confirm") {
+        return this.$message.info("取消删除！");
+      } else {
+        delMovieById(id).then((resp) => {
+          if (resp.code != 200) {
+            return this.$message.error("删除失败！");
+          } else {
+            this.$message.success("删除成功！");
+            this.fetchData();
+          }
+        });
+      }
     },
     async searchList() {
       if (this.queryInfo.username == "") {

@@ -60,3 +60,18 @@ export function delMovieCommentByBatch(ids) {
     data: ids,
   })
 }
+
+export function delMovieById(id) {
+  return request({
+    url: '/admin/movieManager/movie/' + id,
+    method: 'delete',
+  })
+}
+
+export function addMovieInfo(data) {
+  return request({
+    url: '/admin/movieManager/movie/',
+    method: 'post',
+    data:data
+  })
+}

@@ -6,3 +6,10 @@ export function getID() {
         method: 'get'
     })
 }
+
+export function getCategory() {
+    return request({
+        url: '/common/getType',
+        method: 'get'
+    })
+}
